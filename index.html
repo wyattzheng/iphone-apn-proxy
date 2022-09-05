@@ -1,0 +1,126 @@
+<html>
+    <head>
+        <title>iPhone APN Proxy Configurator</title>
+    </head>
+    <body>
+        <pre class="tip">
+Automatically save your configuration
+  to your browser, feel free to use 🎉
+        </pre>
+
+        <div><input id="apn" type="text" placeholder="apn (3gnet)"></input></div>
+        <div><input id="proxy-host" type="text" placeholder="proxyHost (127.0.0.1)"></input></div>
+        <div><input id="proxy-port" type="text" placeholder="proxyPort (1080)"></input></div>
+        <div><button onclick="generate()">🔧 install</button></div>
+    </body>
+    <style>
+        html, body{
+            margin: 0;
+            height: 100%;
+        }
+        body{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        input{
+            margin-bottom: 10px;
+            padding: 5px;
+        }
+        button{
+            padding: 5px 20px;
+        }
+        .tip{
+            height: 50px;
+        }
+    </style>
+    <script>
+        const $ = (selector) => document.querySelector(selector);
+        $('#apn').value = localStorage.getItem('apn') || ''
+        $('#proxy-host').value = localStorage.getItem('proxy-host') || ''
+        $('#proxy-port').value = localStorage.getItem('proxy-port') || ''
+
+        function generate() {
+            const apn = $('#apn').value;
+            const proxyHost = $('#proxy-host').value;
+            const proxyPort = $('#proxy-port').value;
+
+            localStorage.setItem('apn', apn)
+            localStorage.setItem('proxy-host', proxyHost)
+            localStorage.setItem('proxy-port', proxyPort)
+
+            const generated = `
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>PayloadContent</key>
+	<array>
+		<dict>
+			<key>PayloadContent</key>
+			<array>
+				<dict>
+					<key>DefaultsData</key>
+					<dict>
+						<key>apns</key>
+						<array>
+							<dict>
+								<key>apn</key>
+								<string>${apn}</string>
+								<key>proxy</key>
+								<string>${proxyHost}</string>
+								<key>proxyPort</key>
+								<integer>${proxyPort}</integer>
+							</dict>
+						</array>
+					</dict>
+					<key>DefaultsDomainName</key>
+					<string>com.apple.managedCarrier</string>
+				</dict>
+			</array>
+			<key>PayloadDescription</key>
+			<string>Provides customization of carrier Access Point Name.</string>
+			<key>PayloadDisplayName</key>
+			<string>Advanced Settings</string>
+			<key>PayloadIdentifier</key>
+			<string>com.wyatt.gost.apn.apn1</string>
+			<key>PayloadOrganization</key>
+			<string></string>
+			<key>PayloadType</key>
+			<string>com.apple.apn.managed</string>
+			<key>PayloadUUID</key>
+			<string>D7B9651C-7874-4235-AAB5-4FB8209358FA</string>
+			<key>PayloadVersion</key>
+			<integer>1</integer>
+		</dict>
+	</array>
+	<key>PayloadDescription</key>
+	<string>描述文件描述。</string>
+	<key>PayloadDisplayName</key>
+	<string>wyatt-gost-apn</string>
+	<key>PayloadIdentifier</key>
+	<string>com.wyatt.gost.apn</string>
+	<key>PayloadOrganization</key>
+	<string></string>
+	<key>PayloadRemovalDisallowed</key>
+	<false/>
+	<key>PayloadType</key>
+	<string>Configuration</string>
+	<key>PayloadUUID</key>
+	<string>9BD00AB8-6152-4DC4-AA0F-DCEA1F0EDD6D</string>
+	<key>PayloadVersion</key>
+	<integer>1</integer>
+</dict>
+</plist>
+        `;
+            const url = URL.createObjectURL(new Blob([generated]));
+            var link = document.createElement("a")
+            link.href = url;
+            link.download = "apn-proxy.mobileconfig";
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+        }
+    </script>
+</html>
