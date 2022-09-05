@@ -1,57 +1,84 @@
+<!DOCTYPE html>
 <html>
-    <head>
-        <title>iPhone APN Proxy Configurator</title>
-    </head>
-    <body>
-        <pre class="tip">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iPhone APN Proxy Configurator</title>
+</head>
+
+<body>
+    <div class="tip">
+        <pre>
 Automatically save your configuration
   to your browser, feel free to use 🎉
+  
+  tip1💡: save this webpage as a bookmark.
+  tip2💡: create a "iOS shortcut" with this url: 
         </pre>
+        <div class="shortcut-url">https://wyattzheng.github.io/iphone-apn-proxy/?apn=3gnet&host=127.0.0.1&port=1080</div>
+    </div>
 
-        <div><input id="apn" type="text" placeholder="apn (3gnet)"></input></div>
-        <div><input id="proxy-host" type="text" placeholder="proxyHost (127.0.0.1)"></input></div>
-        <div><input id="proxy-port" type="text" placeholder="proxyPort (1080)"></input></div>
-        <div><button onclick="generate()">🔧 install</button></div>
-    </body>
-    <style>
-        html, body{
-            margin: 0;
-            height: 100%;
-        }
-        body{
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-        input{
-            margin-bottom: 10px;
-            padding: 5px;
-        }
-        button{
-            padding: 5px 20px;
-        }
-        .tip{
-            height: 50px;
-        }
-    </style>
-    <script>
-        const $ = (selector) => document.querySelector(selector);
-        $('#apn').value = localStorage.getItem('apn') || ''
-        $('#proxy-host').value = localStorage.getItem('proxy-host') || ''
-        $('#proxy-port').value = localStorage.getItem('proxy-port') || ''
+    <div><input id="apn" type="text" placeholder="apn (3gnet)"></input></div>
+    <div><input id="proxy-host" type="text" placeholder="proxyHost (127.0.0.1)"></input></div>
+    <div><input id="proxy-port" type="text" placeholder="proxyPort (1080)"></input></div>
+    <div><button onclick="generate()">🔧 install</button></div>
+</body>
+<style>
+    html,
+    body {
+        margin: 0;
+        height: 100%;
+    }
 
-        function generate() {
-            const apn = $('#apn').value;
-            const proxyHost = $('#proxy-host').value;
-            const proxyPort = $('#proxy-port').value;
+    body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    pre {
+        margin: 0;
+    }
+    input {
+        margin-bottom: 10px;
+        padding: 5px;
+    }
+    button {
+        padding: 5px 20px;
+    }
+    .tip {
+        font-family: monospace;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    .shortcut-url{
+        color: #666;
+    }
+</style>
+<script>
+    const params = new URLSearchParams(window.location.search)
+    const $ = (selector) => document.querySelector(selector);
+    $('#apn').value = localStorage.getItem('apn.apn') || ''
+    $('#proxy-host').value = localStorage.getItem('apn.proxy-host') || ''
+    $('#proxy-port').value = localStorage.getItem('apn.proxy-port') || ''
 
-            localStorage.setItem('apn', apn)
-            localStorage.setItem('proxy-host', proxyHost)
-            localStorage.setItem('proxy-port', proxyPort)
+    if (params.has('apn')) { // auto
+        $('#apn').value = params.get('apn');
+        $('#proxy-host').value = params.get('host');
+        $('#proxy-port').value = params.get('port');
+        generate();
+    }
 
-            const generated = `
-<?xml version="1.0" encoding="UTF-8"?>
+    function generate() {
+        const apn = $('#apn').value;
+        const proxyHost = $('#proxy-host').value;
+        const proxyPort = $('#proxy-port').value;
+
+        localStorage.setItem('apn.apn', apn)
+        localStorage.setItem('apn.proxy-host', proxyHost)
+        localStorage.setItem('apn.proxy-port', proxyPort)
+
+        const generated = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
@@ -113,14 +140,14 @@ Automatically save your configuration
 	<integer>1</integer>
 </dict>
 </plist>
-        `;
-            const url = URL.createObjectURL(new Blob([generated]));
-            var link = document.createElement("a")
-            link.href = url;
-            link.download = "apn-proxy.mobileconfig";
-            link.style.display = 'none';
-            document.body.appendChild(link);
-            link.click();
-        }
-    </script>
+`;
+        const url = URL.createObjectURL(new Blob([generated], { type: "application/x-apple-aspen-config" }));
+        var link = document.createElement("a")
+        link.href = url;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+    }
+</script>
+
 </html>
